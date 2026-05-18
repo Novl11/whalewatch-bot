@@ -1,0 +1,6 @@
+bot.db
+.env
+__pycache__/
+*.pyc
+bot.log
+nohup.out
