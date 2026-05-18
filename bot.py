@@ -20,6 +20,7 @@ from handlers.top import router as top_router
 from handlers.fng import router as fng_router
 from handlers.market import router as market_router
 from handlers.autoreply import router as autoreply_router
+from handlers.inline import router as inline_router
 
 bot = Bot(token=TELEGRAM_TOKEN)
 dp = Dispatcher()
@@ -39,6 +40,7 @@ dp.include_routers(
     fng_router,
     market_router,
     autoreply_router,
+    inline_router,
 )
 
 
