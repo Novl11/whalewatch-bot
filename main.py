@@ -12,73 +12,46 @@ async def health_check(request):
     return web.Response(text="ok", content_type="text/plain")
 
 
-LANDING_HTML = """<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WhaleWatch Bot — крипто-терминал в Telegram</title>
-<meta name="description" content="Анализ криптовалют: цена, индикаторы RSI/MACD/BB, фьючерсы с funding rate и OI, Fear & Greed Index. Бесплатный Telegram бот.">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0e17;color:#e0e6f0;line-height:1.6}
-.container{max-width:800px;margin:0 auto;padding:40px 20px}
-.header{text-align:center;padding:60px 0 40px}
-.logo{font-size:64px;margin-bottom:16px}
-h1{font-size:36px;font-weight:700;background:linear-gradient(135deg,#4facfe,#00f2fe);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
-.subtitle{font-size:18px;color:#8892b0;margin-bottom:32px}
-.btn{display:inline-block;background:linear-gradient(135deg,#4facfe,#00f2fe);color:#0a0e17;padding:14px 36px;border-radius:12px;text-decoration:none;font-weight:700;font-size:18px;transition:transform .2s}
-.btn:hover{transform:translateY(-2px)}
-.features{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:48px 0}
-.card{background:#111827;border:1px solid #1e293b;border-radius:16px;padding:24px}
-.card h3{font-size:20px;margin-bottom:8px}
-.card p{color:#8892b0;font-size:14px}
-.card .icon{font-size:32px;margin-bottom:12px}
-.pricing{background:#111827;border:1px solid #1e293b;border-radius:16px;padding:32px;margin:48px 0;text-align:center}
-.pricing h2{font-size:28px;margin-bottom:24px}
-.plans{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.plan{padding:24px;border-radius:12px}
-.plan.free{background:#1a2332}
-.plan.pro{background:linear-gradient(135deg,#1a2332,#1e293b);border:1px solid #4facfe}
-.plan h3{font-size:22px;margin-bottom:8px}
-.plan .price{font-size:14px;color:#4facfe;margin-bottom:16px}
-.plan ul{list-style:none;text-align:left}
-.plan li{padding:6px 0;font-size:14px}
-.plan li::before{content:'✅ '}
-.plan.pro li::before{content:'⭐ '}
-.footer{text-align:center;padding:40px 0;color:#4a5568;font-size:14px}
-@media(max-width:640px){.features,.plans{grid-template-columns:1fr}}
-</style>
-</head>
-<body>
-<div class="container">
-<div class="header">
-<div class="logo">🐋</div>
-<h1>WhaleWatch Bot</h1>
-<p class="subtitle">Крипто-терминал в Telegram. Анализ спота и фьючерсов, 18 индикаторов, Fear & Greed, обзор рынка.</p>
-<a class="btn" href="https://t.me/WhaleAnalyst_bot" target="_blank">🚀 Открыть в Telegram</a>
-</div>
-<div class="features">
-<div class="card"><div class="icon">💵</div><h3>Цена 24/7</h3><p>82 монеты. Текущая цена, изменение за 24ч, максимум, минимум, объём.</p></div>
-<div class="card"><div class="icon">📊</div><h3>18 индикаторов</h3><p>RSI, MACD, EMA, SMA, BB, ATR, Stoch, ADX, CCI, WillR, MFI, OBV, VWAP. Бесплатно RSI + EMA21.</p></div>
-<div class="card"><div class="icon">🔥</div><h3>Фьючерсы</h3><p>Funding rate + история, Open Interest, L/S трейдеров, Taker volume, тех. анализ + вердикт LONG/SHORT.</p></div>
-<div class="card"><div class="icon">😱</div><h3>Fear & Greed</h3><p>Индекс страха и жадности за 7 дней. + обзор рынка: доминация BTC, капитализация, объём.</p></div>
-<div class="card"><div class="icon">📈</div><h3>Топ монет</h3><p>Топ роста, падения и объёма за 24ч. Свежие данные с Binance.</p></div>
-<div class="card"><div class="icon">🔔</div><h3>Оповещения</h3><p>Ценовые алерты. Бесплатно до 2, Pro безлимит.</p></div>
-</div>
-<div class="pricing"><h2>💰 Тарифы</h2>
-<div class="plans">
-<div class="plan free"><h3>Бесплатно</h3><div class="price">$0</div><ul><li>Все 82 монеты</li><li>Спот цена и 24ч статистика</li><li>RSI и EMA21 индикаторы</li><li>1 пробный фьючерс</li><li>Топ монет, FNG, обзор рынка</li><li>До 2 оповещений</li></ul></div>
-<div class="plan pro"><h3>⭐ Pro</h3><div class="price">10 USDT / 30 дней</div><ul><li>Все 18 индикаторов</li><li>Все таймфреймы (1m–4h)</li><li>Безлимитные фьючерсы</li><li>Безлимитные оповещения</li><li>Безлимитный вотчлист</li></ul></div>
-</div></div>
-<div class="footer"><p>💰 Оплата: USDT (TRC20) — без посредников</p><p style="margin-top:4px">🐋 <a href="https://t.me/WhaleAnalyst_bot" style="color:#4facfe">@WhaleAnalyst_bot</a></p></div>
-</div>
-</body>
-</html>"""
-
-
 async def index_page(request):
-    return web.Response(text=LANDING_HTML, content_type="text/html; charset=utf-8")
+    html = (
+        "<!DOCTYPE html><html lang='ru'><head><meta charset='UTF-8'>"
+        "<meta name='viewport' content='width=device-width,initial-scale=1'>"
+        "<title>WhaleWatch Bot — крипто-терминал в Telegram</title>"
+        "<style>"
+        "*{margin:0;padding:0;box-sizing:border-box}"
+        "body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0e17;color:#e0e6f0;line-height:1.6}"
+        ".container{max-width:800px;margin:0 auto;padding:40px 20px}"
+        ".header{text-align:center;padding:60px 0 40px}"
+        ".logo{font-size:64px}"
+        "h1{font-size:36px;background:linear-gradient(135deg,#4facfe,#00f2fe);-webkit-background-clip:text;-webkit-text-fill-color:transparent}"
+        ".btn{display:inline-block;background:linear-gradient(135deg,#4facfe,#00f2fe);color:#0a0e17;padding:14px 36px;border-radius:12px;text-decoration:none;font-weight:700}"
+        ".card{background:#111827;border:1px solid #1e293b;border-radius:16px;padding:24px;margin:12px 0}"
+        "@media(max-width:640px){.features{grid-template-columns:1fr}}"
+        "</style></head><body>"
+        "<div class='container'>"
+        "<div class='header'><div class='logo'>&#x1F40B;</div>"
+        "<h1>WhaleWatch Bot</h1>"
+        "<p>Крипто-терминал в Telegram: цена, 18 индикаторов, фьючерсы, FNG, обзор рынка.</p><br/>"
+        "<a class='btn' href='https://t.me/WhaleAnalyst_bot' target='_blank'>&#x1F680; Открыть в Telegram</a></div>"
+        "<div class='features'>"
+        "<div class='card'><h3>&#x1F4B5; Цена 24/7</h3><p>82 монеты: цена, 24ч статистика, макс/мин, объём.</p></div>"
+        "<div class='card'><h3>&#x1F4CA; 18 индикаторов</h3><p>RSI, MACD, BB, ATR, Stoch, ADX, CCI и другие. Бесплатно: RSI + EMA21.</p></div>"
+        "<div class='card'><h3>&#x1F525; Фьючерсы</h3><p>Funding rate, OI, L/S, Taker volume, тех. анализ, вердикт LONG/SHORT.</p></div>"
+        "<div class='card'><h3>&#x1F631; Fear &amp; Greed</h3><p>Индекс страха и жадности + обзор рынка: доминация BTC, капитализация.</p></div>"
+        "<div class='card'><h3>&#x1F4C8; Топ монет</h3><p>Топ роста, падения и объёма за 24ч. Данные Binance.</p></div>"
+        "<div class='card'><h3>&#x1F514; Оповещения</h3><p>Ценовые алерты. Бесплатно до 2, Pro безлимит.</p></div>"
+        "</div>"
+        "<div style='text-align:center;padding:20px;background:#111827;border-radius:16px;margin:24px 0'>"
+        "<h2>Тарифы</h2>"
+        "<p><b>Бесплатно:</b> все монеты, спот, базовые индикаторы, 1 пробный фьючерс</p>"
+        "<p><b>&#x2B50; Pro:</b> 10 USDT / 30 дней — все 18 индикаторов, все таймфреймы, безлимитные фьючерсы</p>"
+        "</div>"
+        "<div style='text-align:center;color:#4a5568;padding:20px'>"
+        "<p>Оплата: USDT (TRC20) — без посредников</p>"
+        "<p>&#x1F40B; <a href='https://t.me/WhaleAnalyst_bot' style='color:#4facfe'>@WhaleAnalyst_bot</a></p>"
+        "</div></div></body></html>"
+    )
+    return web.Response(text=html, content_type="text/html; charset=utf-8")
 
 
 async def start_health_server():
