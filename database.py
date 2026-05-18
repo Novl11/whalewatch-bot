@@ -73,6 +73,14 @@ async def init_db():
             await db.execute("ALTER TABLE users ADD COLUMN trial_futures_used INTEGER DEFAULT 0")
         except aiosqlite.OperationalError:
             pass
+        try:
+            await db.execute("ALTER TABLE users ADD COLUMN referrer_id INTEGER DEFAULT NULL")
+        except aiosqlite.OperationalError:
+            pass
+        try:
+            await db.execute("ALTER TABLE users ADD COLUMN referral_count INTEGER DEFAULT 0")
+        except aiosqlite.OperationalError:
+            pass
         await db.commit()
 
 

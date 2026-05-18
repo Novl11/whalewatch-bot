@@ -12,9 +12,19 @@ async def health_check(request):
     return web.Response(text="ok", content_type="text/plain")
 
 
+async def index_page(request):
+    html_path = os.path.join(os.path.dirname(__file__), "templates", "index.html")
+    try:
+        with open(html_path, "r", encoding="utf-8") as f:
+            return web.Response(text=f.read(), content_type="text/html; charset=utf-8")
+    except FileNotFoundError:
+        return web.Response(text="WhaleWatch Bot", content_type="text/plain")
+
+
 async def start_health_server():
     app = web.Application()
-    app.router.add_get("/", health_check)
+    app.router.add_get("/", index_page)
+    app.router.add_get("/health", health_check)
     port = int(os.getenv("PORT", "8080"))
     runner = web.AppRunner(app)
     await runner.setup()

@@ -13,6 +13,7 @@ from handlers.alerts import router as alerts_router
 from handlers.subscription import router as subscription_router
 from handlers.admin import router as admin_router
 from handlers.help import router as help_router
+from handlers.referral import router as referral_router
 from handlers.callbacks import router as callbacks_router
 from handlers.top import router as top_router
 from handlers.fng import router as fng_router
@@ -30,6 +31,7 @@ dp.include_routers(
     subscription_router,
     admin_router,
     help_router,
+    referral_router,
     callbacks_router,
     top_router,
     fng_router,
