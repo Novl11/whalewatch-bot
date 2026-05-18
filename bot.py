@@ -5,6 +5,7 @@ from database import init_db, get_pending_payments, confirm_payment, activate_pr
 from services.tron import check_incoming_usdt
 from services.alert_checker import check_alerts
 from services.channel_poster import channel_poster
+from services.reminder import daily_reminder
 from handlers.start import router as start_router
 from handlers.price import router as price_router
 from handlers.futures import router as futures_router
@@ -18,6 +19,7 @@ from handlers.callbacks import router as callbacks_router
 from handlers.top import router as top_router
 from handlers.fng import router as fng_router
 from handlers.market import router as market_router
+from handlers.autoreply import router as autoreply_router
 
 bot = Bot(token=TELEGRAM_TOKEN)
 dp = Dispatcher()
@@ -36,6 +38,7 @@ dp.include_routers(
     top_router,
     fng_router,
     market_router,
+    autoreply_router,
 )
 
 
@@ -97,4 +100,5 @@ async def on_startup():
     asyncio.create_task(payment_checker())
     asyncio.create_task(alert_checker_loop())
     asyncio.create_task(channel_poster(bot))
-    print("Bot started. Payment checker + alert checker + channel poster running.")
+    asyncio.create_task(daily_reminder(bot))
+    print("Bot started. All services running.")

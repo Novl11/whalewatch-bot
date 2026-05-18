@@ -11,7 +11,7 @@ async def generate_digest() -> str:
     tickers = await fetch_all_tickers()
     usdt_pairs = {t["symbol"].replace("USDT", ""): t for t in tickers if t["symbol"].endswith("USDT")}
 
-    lines = [f"🐋 *WhaleWatch — Дайджест ({POST_INTERVAL // 3600}ч)*\n"]
+    lines = [f"🐋 *WhaleWatch — Дайджест рынка ({POST_INTERVAL // 3600}ч)*\n"]
 
     for coin in TOP_COINS:
         t = usdt_pairs.get(coin)
@@ -22,7 +22,8 @@ async def generate_digest() -> str:
         emoji = "🟢" if change >= 0 else "🔴"
         vol = float(t.get("quoteVolume", 0))
 
-        line = f"{emoji} *{coin}* ${price:,.2f} ({change:+.2f}%) | Vol: ${vol/1e6:.0f}M"
+        change_str = f"{emoji} {change:+.2f}%"
+        line = f"• *{coin}* ${price:,.2f} | {change_str} | Vol: ${vol/1e6:.0f}M"
 
         try:
             f = await analyze_futures(coin)
@@ -33,7 +34,16 @@ async def generate_digest() -> str:
 
         lines.append(line)
 
-    lines.append(f"\n{BOT_LINK}")
+    lines.extend([
+        "",
+        "━━━━━━━━━━━━━━━",
+        "",
+        f"📊 *Топ за 24ч:* /gainers | 📉 *Падение:* /losers",
+        f"😱 *Fear & Greed:* /fng | 🌍 *Обзор:* /market",
+        f"🔥 *Фьючерсы:* /futures BTC | *Pro:* /pro",
+        "",
+        f"Анализируй любую монету: @WhaleAnalyst_bot",
+    ])
     return "\n".join(lines)
 
 
