@@ -4,12 +4,12 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 import aiosqlite
 from pathlib import Path
-from database import get_or_create_user, get_user, is_pro
+from database import get_or_create_user, get_user, is_pro, add_pro_days
 from utils.keyboards import main_menu
 
 router = Router()
 DB_PATH = Path(__file__).parent.parent / "bot.db"
-REFERRALS_NEEDED = 5
+REFERRALS_NEEDED = 3
 BONUS_DAYS = 1
 
 
@@ -37,19 +37,27 @@ async def cmd_start(message: types.Message, state: FSMContext):
                 (ref_by, message.from_user.id),
             )
             await db.execute(
-                "UPDATE users SET referral_count = referral_count + 1 WHERE id = ? AND referral_count < ?",
-                (ref_by, REFERRALS_NEEDED * 10),
+                "UPDATE users SET referral_count = referral_count + 1 WHERE id = ?",
+                (ref_by,),
             )
             cur = await db.execute(
-                "SELECT referral_count FROM users WHERE id = ?", (ref_by,)
+                "SELECT telegram_id, referral_count FROM users WHERE id = ?", (ref_by,)
             )
             row = await cur.fetchone()
-            if row and row[0] % REFERRALS_NEEDED == 0:
-                await db.execute(
-                    "UPDATE users SET plan = 'pro', expires_at = datetime('now', '+1 days') WHERE id = ?",
-                    (ref_by,),
-                )
             await db.commit()
+            if row and row[1] % REFERRALS_NEEDED == 0:
+                await add_pro_days(row[0], BONUS_DAYS)
+                try:
+                    await message.bot.send_message(
+                        row[0],
+                        f"🎉 *Новый реферал!*\n\n"
+                        f"Ты привёл *{row[1]}* друзей!\n"
+                        f"+{BONUS_DAYS} день Pro начислен.\n"
+                        f"Продолжай в том же духе → /referral",
+                        parse_mode="Markdown",
+                    )
+                except Exception:
+                    pass
 
     is_pro_user = user and user["plan"] == "pro"
     trial_available = not is_pro_user and user.get("trial_futures_used", 0) < 1

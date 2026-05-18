@@ -141,6 +141,25 @@ async def activate_pro(telegram_id: int, days: int, charge_id: str | None = None
         await db.commit()
 
 
+async def add_pro_days(telegram_id: int, days: int):
+    user = await get_or_create_user(telegram_id)
+    now = get_now()
+    if user.get("plan") == "pro" and user.get("expires_at"):
+        exp = datetime.datetime.fromisoformat(user["expires_at"])
+        if exp > now:
+            new_exp = exp + datetime.timedelta(days=days)
+        else:
+            new_exp = now + datetime.timedelta(days=days)
+    else:
+        new_exp = now + datetime.timedelta(days=days)
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "UPDATE users SET plan = 'pro', expires_at = ? WHERE telegram_id = ?",
+            (new_exp.isoformat(), telegram_id),
+        )
+        await db.commit()
+
+
 async def cancel_pro(telegram_id: int):
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(
