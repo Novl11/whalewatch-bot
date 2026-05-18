@@ -4,6 +4,7 @@ from config import TELEGRAM_TOKEN, ADMIN_ID, PRO_DURATION_DAYS, PRO_PRICE_USDT
 from database import init_db, get_pending_payments, confirm_payment, activate_pro, get_confirmed_txids
 from services.tron import check_incoming_usdt
 from services.alert_checker import check_alerts
+from services.channel_poster import channel_poster
 from handlers.start import router as start_router
 from handlers.price import router as price_router
 from handlers.futures import router as futures_router
@@ -93,4 +94,5 @@ async def on_startup():
     await init_db()
     asyncio.create_task(payment_checker())
     asyncio.create_task(alert_checker_loop())
-    print("Bot started. Payment checker + alert checker running.")
+    asyncio.create_task(channel_poster(bot))
+    print("Bot started. Payment checker + alert checker + channel poster running.")

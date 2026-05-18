@@ -106,7 +106,8 @@ async def show_price(msg: types.Message, coin: str):
         InlineKeyboardButton(text="🏠 Меню", callback_data="menu"),
     )
 
-    add_footer_to_builder(builder)
+    share_txt = f"{display_coin(coin)}/USDT ${price:,.2f} ({change:+.2f}%)"
+    add_footer_to_builder(builder, share_txt)
     await sent.edit_text(add_footer(text), parse_mode="Markdown", reply_markup=builder.as_markup())
 
 
@@ -205,7 +206,7 @@ async def show_indicators(msg: types.Message, coin: str, timeframe: str = "15m")
     if not pro:
         lines.append("\n_➕ 16 индикаторов заблокировано. Купи Pro чтобы открыть все._")
     builder.row(InlineKeyboardButton(text="🏠 Меню", callback_data="menu"))
-    add_footer_to_builder(builder)
+    add_footer_to_builder(builder, f"{display_coin(coin)} индикаторы ({tf_label})")
     await sent.edit_text(add_footer("\n".join(lines)), parse_mode="Markdown", reply_markup=builder.as_markup())
 
 

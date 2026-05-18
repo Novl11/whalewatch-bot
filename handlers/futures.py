@@ -158,7 +158,7 @@ async def show_futures(msg: types.Message, coin: str, trial: bool = False):
 
     builder = InlineKeyboardBuilder()
     builder.row(InlineKeyboardButton(text="🏠 Меню", callback_data="menu"))
-    add_footer_to_builder(builder)
+    add_footer_to_builder(builder, f"{display_coin(coin)} {a['verdict']}")
     if len(text) > 4000:
         text = text[:3997] + "..."
 
