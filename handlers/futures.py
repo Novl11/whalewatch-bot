@@ -8,6 +8,7 @@ from services.futures_analysis import analyze_futures
 from utils.coins import COIN_WHITELIST, display_coin
 from utils.formatting import format_price, format_change, format_volume, format_funding_rate
 from utils.keyboards import coin_selection
+from utils.footer import add_footer, add_footer_to_builder
 
 router = Router()
 
@@ -157,7 +158,8 @@ async def show_futures(msg: types.Message, coin: str, trial: bool = False):
 
     builder = InlineKeyboardBuilder()
     builder.row(InlineKeyboardButton(text="🏠 Меню", callback_data="menu"))
+    add_footer_to_builder(builder)
     if len(text) > 4000:
         text = text[:3997] + "..."
 
-    await sent.edit_text(text, parse_mode="Markdown", reply_markup=builder.as_markup())
+    await sent.edit_text(add_footer(text), parse_mode="Markdown", reply_markup=builder.as_markup())

@@ -12,6 +12,7 @@ from utils.coins import COIN_WHITELIST, FREE_COINS, display_coin
 from utils.limits import FREE_INDICATORS, FREE_INTERVALS
 from utils.keyboards import coin_selection, timeframe_selection
 from utils.formatting import format_price, format_change, format_volume
+from utils.footer import add_footer, add_footer_to_builder
 
 router = Router()
 
@@ -105,7 +106,8 @@ async def show_price(msg: types.Message, coin: str):
         InlineKeyboardButton(text="🏠 Меню", callback_data="menu"),
     )
 
-    await sent.edit_text(text, parse_mode="Markdown", reply_markup=builder.as_markup())
+    add_footer_to_builder(builder)
+    await sent.edit_text(add_footer(text), parse_mode="Markdown", reply_markup=builder.as_markup())
 
 
 @router.message(Command("indicators"))
@@ -203,7 +205,8 @@ async def show_indicators(msg: types.Message, coin: str, timeframe: str = "15m")
     if not pro:
         lines.append("\n_➕ 16 индикаторов заблокировано. Купи Pro чтобы открыть все._")
     builder.row(InlineKeyboardButton(text="🏠 Меню", callback_data="menu"))
-    await sent.edit_text("\n".join(lines), parse_mode="Markdown", reply_markup=builder.as_markup())
+    add_footer_to_builder(builder)
+    await sent.edit_text(add_footer("\n".join(lines)), parse_mode="Markdown", reply_markup=builder.as_markup())
 
 
 @router.callback_query(F.data.regexp(r"^indicators_tf_menu:(\w+)$"))
