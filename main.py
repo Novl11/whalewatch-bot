@@ -7,20 +7,6 @@ sys.path.insert(0, os.path.dirname(__file__))
 from aiohttp import web
 from bot import dp, bot, on_startup
 
-# Conditional signal bot (only if token is set)
-SIGNALS_TOKEN = os.getenv("SIGNALS_BOT_TOKEN", "")
-if SIGNALS_TOKEN:
-    import importlib
-    sig = importlib.import_module("signals_bot")
-    signals_bot = sig.bot
-    signals_dp = sig.dp
-    async def signals_start():
-        await sig.start_polling()
-else:
-    signals_bot = None
-    async def signals_start():
-        pass
-
 
 async def health_check(request):
     return web.Response(text="ok", content_type="text/plain")
@@ -90,11 +76,6 @@ async def main():
 async def _run_bot():
     await on_startup()
     print("🐋 WhaleWatch Bot is running...")
-
-    if signals_bot:
-        print("📊 WhaleSignals Bot is running...")
-        asyncio.create_task(signals_start())
-
     await dp.start_polling(bot, handle_signals=True)
 
 
