@@ -79,6 +79,27 @@ async def signals(msg: types.Message):
         await m.edit_text(f"❌ *Ошибка:* {e}", parse_mode="Markdown")
 
 
+@dp.message(Command("status"))
+async def status(msg: types.Message):
+    """Диагностика: проверка связи с Binance."""
+    from services.binance import fetch_all_futures_tickers, fetch_klines
+    lines = ["📊 *Статус*\n"]
+    try:
+        t = await fetch_all_futures_tickers()
+        lines.append(f"✅ Binance: {len(t)} USDT пар")
+        btc = next((x for x in t if x["symbol"] == "BTCUSDT"), None)
+        if btc:
+            lines.append(f"BTC: ${float(btc['lastPrice']):,.2f}")
+    except Exception as e:
+        lines.append(f"❌ Binance: {e}")
+    try:
+        k = await fetch_klines("BTC", "1h", 2)
+        lines.append(f"✅ Klines: {len(k)} свечей")
+    except Exception as e:
+        lines.append(f"❌ Klines: {e}")
+    await msg.answer("\n".join(lines), parse_mode="Markdown")
+
+
 async def start_polling():
     asyncio.create_task(auto_scan())
     await dp.start_polling(bot)

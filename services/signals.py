@@ -28,9 +28,9 @@ async def scan_signals() -> dict:
     short_list = []
     for r in results:
         if isinstance(r, dict) and "score" in r:
-            if r["score"] >= 4:
+            if r["score"] >= 3:
                 long_list.append(r)
-            elif r["score"] <= -4:
+            elif r["score"] <= -3:
                 short_list.append(r)
 
     long_list.sort(key=lambda x: x["score"], reverse=True)
@@ -212,17 +212,17 @@ async def _analyze(ticker: dict) -> dict | None:
     score = long_score - short_score
     reasons = long_r if score > 0 else short_r
 
-    if score >= 10:
+    if score >= 9:
         label = "🔥 STRONG LONG"; emoji = "🔥"
-    elif score >= 7:
+    elif score >= 6:
         label = "🟢 LONG"; emoji = "🟢"
-    elif score >= 4:
+    elif score >= 3:
         label = "🟡 SLIGHT LONG"; emoji = "🟡"
-    elif score <= -10:
+    elif score <= -9:
         label = "🔥 STRONG SHORT"; emoji = "🔥"
-    elif score <= -7:
+    elif score <= -6:
         label = "🔴 SHORT"; emoji = "🔴"
-    elif score <= -4:
+    elif score <= -3:
         label = "🟡 SLIGHT SHORT"; emoji = "🟡"
     else:
         return None
