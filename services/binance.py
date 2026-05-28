@@ -6,19 +6,26 @@ from config import BINANCE_SPOT_API, BINANCE_FUTURES_API
 from utils.coins import binance_symbol, binance_futures_symbol
 
 _SSL_CTX = ssl.create_default_context(cafile=certifi.where())
+_SESSION: aiohttp.ClientSession | None = None
 
 
-async def _fetch(url: str, timeout: int = 10) -> dict | list | None:
+async def _get_session() -> aiohttp.ClientSession:
+    global _SESSION
+    if _SESSION is None:
+        _SESSION = aiohttp.ClientSession(
+            connector=aiohttp.TCPConnector(ssl=_SSL_CTX, limit=100),
+            timeout=aiohttp.ClientTimeout(total=15),
+        )
+    return _SESSION
+
+
+async def _fetch(url: str) -> dict | list | None:
     try:
-        connector = aiohttp.TCPConnector(ssl=_SSL_CTX)
-        async with aiohttp.ClientSession(
-            connector=connector,
-            timeout=aiohttp.ClientTimeout(total=timeout),
-        ) as session:
-            async with session.get(url, headers={"Accept": "application/json"}) as resp:
-                if resp.status != 200:
-                    return None
-                return await resp.json()
+        session = await _get_session()
+        async with session.get(url, headers={"Accept": "application/json"}) as resp:
+            if resp.status != 200:
+                return None
+            return await resp.json()
     except Exception:
         return None
 
