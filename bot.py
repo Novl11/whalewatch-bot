@@ -2,14 +2,12 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
-from config import TELEGRAM_TOKEN, ADMIN_ID, PRO_DURATION_DAYS, PRO_PRICE_USDT, SCAN_INTERVAL_MINUTES
+from config import TELEGRAM_TOKEN, ADMIN_ID, PRO_DURATION_DAYS, PRO_PRICE_USDT
 from database import init_db, get_pending_payments, confirm_payment, activate_pro, get_confirmed_txids
 from services.tron import check_incoming_usdt
 from services.alert_checker import check_alerts
 from services.channel_poster import channel_poster
 from services.reminder import daily_reminder
-from services.signals import scan_signals
-
 logger = logging.getLogger(__name__)
 from handlers.start import router as start_router
 from handlers.price import router as price_router
@@ -104,56 +102,10 @@ async def alert_checker_loop():
         await asyncio.sleep(30)
 
 
-def _fmt_signals(result: dict) -> str:
-    lines = ["📊 *Авто-скан сигналов*\n"]
-    lines.append("🟢 *LONG*")
-    for s in result.get("long", []):
-        r = " · ".join(s["reasons"]) if s.get("reasons") else ""
-        lines.append(
-            f"• *{s['coin']}* ${s['price']:,.2f} ({s['change']:+.2f}%) — {s['signal']}\n"
-            f"   RSI {s['rsi']:.0f} | ADX {s['adx']:.0f}"
-            + (f" | Funding {s['funding']:+.3f}%" if s.get("funding") is not None else "")
-            + (f"\n   {r}" if r else "")
-        )
-    if not result.get("long"):
-        lines.append("_Нет уверенных LONG_")
-    lines.append("")
-    lines.append("🔴 *SHORT*")
-    for s in result.get("short", []):
-        r = " · ".join(s["reasons"]) if s.get("reasons") else ""
-        lines.append(
-            f"• *{s['coin']}* ${s['price']:,.2f} ({s['change']:+.2f}%) — {s['signal']}\n"
-            f"   RSI {s['rsi']:.0f} | ADX {s['adx']:.0f}"
-            + (f" | Funding {s['funding']:+.3f}%" if s.get("funding") is not None else "")
-            + (f"\n   {r}" if r else "")
-        )
-    if not result.get("short"):
-        lines.append("_Нет уверенных SHORT_")
-    lines.append("")
-    lines.append(f"⏱ Каждые {SCAN_INTERVAL_MINUTES} мин")
-    return "\n".join(lines)
-
-
-async def signal_scanner():
-    """Background: scan every N min, send signals to admin."""
-    await asyncio.sleep(30)
-    logger.info("Signal scanner started, interval=%d min", SCAN_INTERVAL_MINUTES)
-    while True:
-        try:
-            result = await scan_signals()
-            text = _fmt_signals(result)
-            await bot.send_message(ADMIN_ID, text, parse_mode="Markdown", disable_web_page_preview=True)
-        except Exception as e:
-            logger.error("Signal scan error: %s", e)
-        await asyncio.sleep(SCAN_INTERVAL_MINUTES * 60)
-
-
 async def on_startup():
     await init_db()
     asyncio.create_task(payment_checker())
     asyncio.create_task(alert_checker_loop())
     asyncio.create_task(channel_poster(bot))
     asyncio.create_task(daily_reminder(bot))
-    if ADMIN_ID:
-        asyncio.create_task(signal_scanner())
     print("Bot started. All services running.")

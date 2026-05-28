@@ -66,10 +66,24 @@ async def start_health_server():
     print(f"🌐 Health server on port {port}")
 
 
+async def _run_signals_bot():
+    token = os.getenv("SIGNALS_BOT_TOKEN", "")
+    if not token:
+        return
+    try:
+        import importlib
+        mod = importlib.import_module("signals_bot")
+        print("📊 WhaleSignals Bot is running...")
+        await mod.start_polling()
+    except Exception as e:
+        print(f"⚠️ WhaleSignals Bot skipped: {e}")
+
+
 async def main():
     await asyncio.gather(
         start_health_server(),
         _run_bot(),
+        _run_signals_bot(),
     )
 
 
