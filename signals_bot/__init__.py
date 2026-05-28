@@ -2,16 +2,15 @@
 
 import asyncio
 import logging
+import os
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-
-import os
+from services.signals import scan_signals
 
 ADMIN_ID = int(os.getenv("ADMIN_ID", "7628819631"))
 SIGNALS_BOT_TOKEN = os.getenv("SIGNALS_BOT_TOKEN", "")
 SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL", "30"))
-from services.signals import scan_signals
 
 logger = logging.getLogger(__name__)
 
@@ -68,9 +67,6 @@ async def scan_loop():
 
 @dp.message(Command("start"))
 async def cmd_start(msg: types.Message):
-    if msg.from_user.id != ADMIN_ID:
-        await msg.answer("❌ Только для админа")
-        return
     await msg.answer(
         f"👋 *WhaleSignals Bot*\n\n"
         f"Каждые {SCAN_INTERVAL_MINUTES} мин сканирую топ-100 монет → сигналы.\n\n"
