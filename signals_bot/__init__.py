@@ -78,8 +78,6 @@ async def cmd_start(msg: types.Message):
 
 @dp.message(Command("signals"))
 async def cmd_signals(msg: types.Message):
-    if msg.from_user.id != ADMIN_ID:
-        return
     m = await msg.answer("🔍 *Сканирую…*", parse_mode="Markdown")
     try:
         result = await scan_signals()
