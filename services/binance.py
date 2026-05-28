@@ -61,6 +61,13 @@ async def fetch_all_tickers() -> list[dict]:
     return []
 
 
+async def fetch_all_futures_tickers() -> list[dict]:
+    data = await _fetch(f"{BINANCE_FUTURES_API}/fapi/v1/ticker/24hr")
+    if isinstance(data, list):
+        return [t for t in data if t.get("symbol", "").endswith("USDT")]
+    return []
+
+
 async def fetch_spot_price(coin: str) -> float | None:
     symbol = binance_symbol(coin)
     data = await _fetch(f"{BINANCE_SPOT_API}/api/v3/ticker/price?symbol={symbol}")
