@@ -115,6 +115,9 @@ async def get_user(telegram_id: int):
 
 
 async def is_pro(telegram_id: int) -> bool:
+    from config import ADMIN_ID
+    if telegram_id == ADMIN_ID:
+        return True
     user = await get_user(telegram_id)
     if not user or user["plan"] != "pro":
         return False
